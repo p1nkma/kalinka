@@ -57,7 +57,7 @@ WORKDIR /calcom
 
 RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd wget && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /calcom/package.json /calcom/yarn.lock /calcom/.yarnrc.yml ./
+COPY --from=builder /calcom/package.json /calcom/yarn.lock /calcom/.yarnrc.yml /calcom/i18n.json ./
 COPY --from=builder /calcom/.yarn/releases ./.yarn/releases
 COPY --from=builder /calcom/node_modules ./node_modules
 COPY --from=builder /calcom/packages ./packages
