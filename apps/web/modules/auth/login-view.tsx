@@ -184,7 +184,7 @@ export default function Login({
         <div className="w-full rounded-xl border border-subtle bg-default p-10 shadow-sm">
           {/* Logo */}
           <div className="mb-2 text-center">
-            <Logo />
+            <Logo className="[&_img]:h-14" />
           </div>
 
           {/* Heading */}
