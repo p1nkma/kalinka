@@ -34,3 +34,9 @@ Thumbs.db
 
 # Examples and docs
 docs
+
+# Keep runtime secrets out of the build context.
+.env
+.env.*
+**/.env
+**/.env.*

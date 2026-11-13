@@ -1,0 +1,38 @@
+name: kalinka-local
+
+volumes:
+  kalinka-local-db:
+
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - kalinka-local-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: kalinka_dev
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.kalinka-local}
+      POSTGRES_DB: kalinka_dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kalinka_dev -d kalinka_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  kalinka:
+    image: kalinka:latest
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      NEXT_PUBLIC_WEBAPP_URL: http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3000/api/auth
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?Set NEXTAUTH_SECRET in .env.kalinka-local}
+      CALENDSO_ENCRYPTION_KEY: ${CALENDSO_ENCRYPTION_KEY:?Set CALENDSO_ENCRYPTION_KEY in .env.kalinka-local}
+      DATABASE_URL: postgresql://kalinka_dev:${POSTGRES_PASSWORD}@database:5432/kalinka_dev
+      DATABASE_HOST: database:5432
+      CALCOM_TELEMETRY_DISABLED: "1"
+    depends_on:
+      database:
+        condition: service_healthy

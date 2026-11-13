@@ -1,13 +1,24 @@
-FROM=$1
-TO=$2
+#!/bin/sh
+set -eu
 
-if [ "${FROM}" = "${TO}" ]; then
-    echo "Nothing to replace, the value is already set to ${TO}."
+from=$1
+to=$2
+
+if [ "$from" = "$to" ]; then
     exit 0
 fi
 
-echo "Replacing all statically built instances of $FROM with $TO."
-
-for file in $(egrep -r -l "${FROM}" apps/web/.next/ apps/web/public/); do
-    sed -i -e "s|$FROM|$TO|g" "$file"
-done
+pattern=$(printf '%s' "$from" | sed 's/[][\.^$*|]/\\&/g')
+replacement=$(printf '%s' "$to" | sed 's/[\&|]/\\&/g')
+find apps/web/.next apps/web/public -type f \( \
+    -name '*.js' -o -name '*.json' -o -name '*.html' -o -name '*.rsc' -o -name '*.txt' -o -name '*.body' -o -name '*.map' -o -name '*.css' \
+\) -exec sh -ec '
+    pattern=$1
+    replacement=$2
+    shift 2
+    for file do
+        if grep -q -- "$pattern" "$file"; then
+            sed -i "s|$pattern|$replacement|g" "$file"
+        fi
+    done
+' sh "$pattern" "$replacement" {} +
