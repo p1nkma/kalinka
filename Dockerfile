@@ -55,6 +55,8 @@ FROM node:22 AS runner
 
 WORKDIR /calcom
 
+ARG NEXT_PUBLIC_DISABLE_SIGNUP=false
+
 RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd wget && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /calcom/package.json /calcom/yarn.lock /calcom/.yarnrc.yml /calcom/i18n.json ./
@@ -67,6 +69,7 @@ RUN chmod +x scripts/*
 
 ENV NODE_ENV=production \
   NEXT_TELEMETRY_DISABLED=1 \
+  NEXT_PUBLIC_DISABLE_SIGNUP=$NEXT_PUBLIC_DISABLE_SIGNUP \
   NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000 \
   BUILT_NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER
 

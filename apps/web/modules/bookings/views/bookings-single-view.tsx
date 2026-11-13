@@ -1034,40 +1034,34 @@ export default function Success(props: PageProps) {
                       </>
                     )}
 
-                    {session === null && !(userIsOwner || props.hideBranding) && (
-                      <>
-                        <hr className="border-subtle mt-8" />
-                        <div className="text-default pt-8 text-center text-xs">
-                          <a href="https://cal.com/signup">
-                            {t("create_booking_link_with_calcom", { appName: APP_NAME })}
-                          </a>
+                    {process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== "true" &&
+                      session === null &&
+                      !props.hideBranding && (
+                        <>
+                          <hr className="border-subtle mt-8" />
+                          <div className="text-default pt-8 text-center text-xs">
+                            <Link href="/signup">
+                              {t("create_booking_link_with_calcom", { appName: APP_NAME })}
+                            </Link>
 
-                          <form
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              const target = e.target as typeof e.target & {
-                                email: { value: string };
-                              };
-                              router.push(`https://cal.com/signup?email=${target.email.value}`);
-                            }}
-                            className="mt-4 flex">
-                            <EmailInput
-                              name="email"
-                              id="email"
-                              defaultValue={email}
-                              className="mr- focus:border-brand-default border-default text-default mt-0 block w-full rounded-none rounded-l-md shadow-sm focus:ring-black sm:text-sm"
-                              placeholder="rick.astley@cal.com"
-                            />
-                            <Button
-                              type="submit"
-                              className="min-w-max rounded-none rounded-r-md"
-                              color="primary">
-                              {t("try_for_free")}
-                            </Button>
-                          </form>
-                        </div>
-                      </>
-                    )}
+                            <form action="/signup" method="get" className="mt-4 flex">
+                              <EmailInput
+                                name="email"
+                                id="email"
+                                defaultValue={email}
+                                className="mr- focus:border-brand-default border-default text-default mt-0 block w-full rounded-none rounded-l-md shadow-sm focus:ring-black sm:text-sm"
+                                placeholder="email@example.com"
+                              />
+                              <Button
+                                type="submit"
+                                className="min-w-max rounded-none rounded-r-md"
+                                color="primary">
+                                {t("try_for_free")}
+                              </Button>
+                            </form>
+                          </div>
+                        </>
+                      )}
                   </>
                 )}
                 {isFeedbackMode &&
