@@ -6,6 +6,7 @@ import {
   FAVICON_32,
   IS_SELF_HOSTED,
   LOGO,
+  LOGO_DARK,
   LOGO_ICON,
   MSTILE_ICON,
   WEBAPP_URL,
@@ -42,6 +43,7 @@ const SYSTEM_SUBDOMAINS = ["console", "app", "www"];
 
 type LogoType =
   | "logo"
+  | "logo-dark"
   | "icon"
   | "favicon-16"
   | "favicon-32"
@@ -60,6 +62,10 @@ type LogoTypeDefinition = {
 const logoDefinitions: Record<LogoType, LogoTypeDefinition> = {
   logo: {
     fallback: `${WEBAPP_URL}${LOGO}`,
+    source: "appLogo",
+  },
+  "logo-dark": {
+    fallback: `${WEBAPP_URL}${LOGO_DARK}`,
     source: "appLogo",
   },
   icon: {
@@ -105,7 +111,7 @@ const logoDefinitions: Record<LogoType, LogoTypeDefinition> = {
 };
 
 function isValidLogoType(type: string): type is LogoType {
-  return type in logoDefinitions;
+  return Object.hasOwn(logoDefinitions, type);
 }
 
 async function getTeamLogos(subdomain: string, isValidOrgDomain: boolean) {
@@ -186,7 +192,14 @@ async function getHandler(request: NextRequest) {
   // Resolve all icon types to team logos, falling back to Cal.diy defaults.
   const type: LogoType = parsedQuery?.type && isValidLogoType(parsedQuery.type) ? parsedQuery.type : "logo";
   const logoDefinition = logoDefinitions[type];
-  const filteredLogo = teamLogos[logoDefinition.source] ?? logoDefinition.fallback;
+  const customLogo = teamLogos[logoDefinition.source];
+  const filteredLogo = customLogo ?? logoDefinition.fallback;
+  // The built-in assets are served by this Next.js instance, even behind an HTTPS proxy.
+  const fallback = new URL(logoDefinition.fallback).pathname;
+
+  if (!customLogo) {
+    return NextResponse.redirect(new URL(fallback, WEBAPP_URL));
+  }
 
   try {
     let response: Response;
@@ -200,8 +213,7 @@ async function getHandler(request: NextRequest) {
       const validation = await validateUrlForSSRF(filteredLogo);
       if (!validation.isValid) {
         logBlockedSSRFAttempt(filteredLogo, validation.error || "Unknown", { subdomain });
-        // Graceful degradation: use default logo instead of error
-        response = await fetch(logoDefinition.fallback);
+        return NextResponse.redirect(new URL(fallback, WEBAPP_URL));
       } else {
         response = await fetch(filteredLogo, {
           signal: AbortSignal.timeout(10000), // 10s conservative timeout

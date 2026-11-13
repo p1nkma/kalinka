@@ -329,9 +329,11 @@
   --cal-text-error: hsla(0, 63%, 31%, 1);
 
   /* Brand */
-  --cal-brand: hsla(221, 39%, 11%, 1);
-  --cal-brand-emphasis: hsla(0, 0%, 6%, 1);
-  --cal-brand-text: hsla(0, 0%, 100%, 1);
+  --cal-brand: #C23636;
+  --cal-brand-emphasis: #A62B2B;
+  --cal-brand-text: #FFFFFF;
+  --cal-brand-subtle: #D35A63;
+  --cal-brand-accent: #F6EFE4;
 
   /* Box Shadows */
   --shadow-dropdown: 0px 5px 20px 0px rgba(0, 0, 0, 0.10), 0px 10px 40px 0px rgba(0, 0, 0, 0.03);
@@ -453,9 +455,11 @@
   --cal-text-error: hsla(3, 66%, 93%, 1);
 
   /* Brand */
-  --cal-brand: hsla(0, 0%, 100%, 1);
-  --cal-brand-emphasis: hsla(218, 11%, 65%, 1);
-  --cal-brand-text: hsla(0, 0%, 0%, 1);
+  --cal-brand: #E85D5D;
+  --cal-brand-emphasis: #DE5F5F;
+  --cal-brand-text: #1A1A1B;
+  --cal-brand-subtle: #D35A63;
+  --cal-brand-accent: #F6EFE4;
 
   /* Fill Colors */
   --fill-emphasis: var(--cal-text-emphasis);

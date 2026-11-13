@@ -150,10 +150,7 @@ const OnboardingPage = (props: PageProps) => {
   return (
     <div
       className={classNames(
-        "text-emphasis min-h-screen [--cal-brand:#111827] dark:[--cal-brand:#FFFFFF]",
-        "[--cal-brand-emphasis:#101010] dark:[--cal-brand-emphasis:#e1e1e1]",
-        "[--cal-brand-subtle:#9CA3AF]",
-        "[--cal-brand-text:#FFFFFF]  dark:[--cal-brand-text:#000000]",
+        "text-emphasis min-h-screen",
         "[--cal-brand-accent:#FFFFFF] dark:[--cal-brand-accent:#000000]"
       )}
       data-testid="onboarding"
