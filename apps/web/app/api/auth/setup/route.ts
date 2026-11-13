@@ -8,10 +8,10 @@ import { hashPassword } from "@calcom/lib/auth/hashPassword";
 import { isPasswordValid } from "@calcom/lib/auth/isPasswordValid";
 import { emailRegex } from "@calcom/lib/emailSchema";
 import { HttpError } from "@calcom/lib/http-error";
+import { isPrismaError } from "@calcom/lib/server/getServerErrorFromUnknown";
 import slugify from "@calcom/lib/slugify";
 import prisma from "@calcom/prisma";
-import { IdentityProvider } from "@calcom/prisma/enums";
-import { CreationSource } from "@calcom/prisma/enums";
+import { CreationSource, IdentityProvider } from "@calcom/prisma/enums";
 
 const querySchema = z.object({
   username: z
@@ -40,21 +40,41 @@ async function handler(req: NextRequest) {
   const username = slugify(parsedQuery.data.username.trim());
   const userEmail = parsedQuery.data.email_address.toLowerCase();
 
+  if (!username) {
+    throw new HttpError({ statusCode: 422, message: "Invalid username" });
+  }
+
   const hashedPassword = await hashPassword(parsedQuery.data.password);
 
-  await prisma.user.create({
-    data: {
-      username,
-      email: userEmail,
-      password: { create: { hash: hashedPassword } },
-      role: "ADMIN",
-      name: parsedQuery.data.full_name,
-      emailVerified: new Date(),
-      locale: "en", // TODO: We should revisit this
-      identityProvider: IdentityProvider.CAL,
-      creationSource: CreationSource.WEBAPP,
-    },
-  });
+  try {
+    await prisma.$transaction(
+      async (tx) => {
+        if ((await tx.user.count()) !== 0) {
+          throw new HttpError({ statusCode: 400, message: "No setup needed." });
+        }
+
+        await tx.user.create({
+          data: {
+            username,
+            email: userEmail,
+            password: { create: { hash: hashedPassword } },
+            role: "ADMIN",
+            name: parsedQuery.data.full_name,
+            emailVerified: new Date(),
+            locale: "en", // TODO: We should revisit this
+            identityProvider: IdentityProvider.CAL,
+            creationSource: CreationSource.WEBAPP,
+          },
+        });
+      },
+      { isolationLevel: "Serializable" }
+    );
+  } catch (error) {
+    if (isPrismaError(error) && (error.code === "P2034" || error.code === "P2002")) {
+      throw new HttpError({ statusCode: 400, message: "No setup needed." });
+    }
+    throw error;
+  }
 
   return NextResponse.json({ message: "First admin user created successfully." });
 }
