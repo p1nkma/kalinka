@@ -1,3 +1,11 @@
+## Kalinka
+
+Kalinka is a self-hosted scheduling platform based on [Cal.diy](https://github.com/calcom/cal.diy). Hosts publish their availability and share a link for guests to book a meeting. The fork retains the upstream [MIT license](LICENSE) and copyright.
+
+See the [Kalinka deployment guide](docs/kalinka-deployment.md) for local setup, the first administrator account, HTTPS, updates and database backups.
+
+## Upstream Cal.diy reference
+
 > [!WARNING]  
 > Use at your own risk. Cal.diy is the open source community edition of Cal.com and it is intended for users who want to self-host their own Cal.diy instance. It is strictly recommended for personal, non-production use. Please review all installation and configuration steps carefully. Self-hosting requires advanced knowledge of server administration, database management, and securing sensitive data. Proceed only if you are comfortable with these responsibilities.
 
